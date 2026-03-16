@@ -49,8 +49,9 @@ def test_create_agent_uses_system_prompt():
 @pytest.mark.integration
 def test_create_agent_integration():
     """実際のBedrockModelを使ったスモークテスト（AWS認証必要）"""
-    from diagnosis.agent import create_agent
     from strands import Agent
+
+    from diagnosis.agent import create_agent
 
     agent = create_agent()
     assert isinstance(agent, Agent)
