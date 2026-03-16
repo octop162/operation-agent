@@ -24,6 +24,9 @@ dev = [
     "lefthook>=2.1.4",
     "mypy>=1.10",
     "boto3-stubs[lambda,logs]>=1.0",
+    "aws-cdk-lib>=2.243.0",
+    "constructs>=10.0.0",
+    "aws-cdk-aws-bedrock-agentcore-alpha>=2.243.0a0",
 ]
 
 [tool.uv]
