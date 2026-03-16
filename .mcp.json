@@ -1,0 +1,22 @@
+{
+  "mcpServers": {
+    "strands": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "strands-agents-mcp-server"
+      ],
+      "env": {}
+    },
+    "aws-iac-mcp-server": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "awslabs.aws-iac-mcp-server"
+      ],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      }
+    }
+  }
+}
