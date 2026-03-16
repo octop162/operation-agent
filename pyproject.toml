@@ -23,7 +23,7 @@ dev = [
     "ipykernel>=6.0",
     "lefthook>=2.1.4",
     "mypy>=1.10",
-    "boto3-stubs[lambda]>=1.0",
+    "boto3-stubs[lambda,logs]>=1.0",
 ]
 
 [tool.uv]

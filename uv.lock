@@ -394,6 +394,9 @@ wheels = [
 lambda = [
     { name = "mypy-boto3-lambda" },
 ]
+logs = [
+    { name = "mypy-boto3-logs" },
+]
 
 [[package]]
 name = "botocore"
@@ -1865,6 +1868,18 @@ wheels = [
 ]
 
 [[package]]
+name = "mypy-boto3-logs"
+version = "1.42.60"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9f/3f/a9dde032777889886f8ff1916b6b6994c8cb7de6a6ef4fe32b5065ba0cbc/mypy_boto3_logs-1.42.60.tar.gz", hash = "sha256:08110d32d9332d7aa08c2cba0f5c3813ed1beb74c682e7407519fe4f3d1b2bff", size = 53055, upload-time = "2026-03-03T21:38:27.74Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ed/c2/1e8946f9658af391a2e394b33b0ba40c802e6548623d5ca9f09c26edc21c/mypy_boto3_logs-1.42.60-py3-none-any.whl", hash = "sha256:4a34c1224a11d09b883789c47f1bd2910e7b50151fdec63266f7ff543caca3d0", size = 60212, upload-time = "2026-03-03T21:38:23.786Z" },
+]
+
+[[package]]
 name = "mypy-extensions"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2032,7 +2047,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "boto3-stubs", extra = ["lambda"] },
+    { name = "boto3-stubs", extra = ["lambda", "logs"] },
     { name = "ipykernel" },
     { name = "jupyterlab" },
     { name = "lefthook" },
@@ -2052,7 +2067,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "boto3-stubs", extras = ["lambda"], specifier = ">=1.0" },
+    { name = "boto3-stubs", extras = ["lambda", "logs"], specifier = ">=1.0" },
     { name = "ipykernel", specifier = ">=6.0" },
     { name = "jupyterlab", specifier = ">=4.0" },
     { name = "lefthook", specifier = ">=2.1.4" },
