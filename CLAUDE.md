@@ -26,6 +26,7 @@ uv run pytest tests/ -m integration   # 統合テスト（AWS認証必要）
 - .envファイルは絶対に編集・コミットしない
 - リンター設定（pyproject.toml, lefthook.yml）を変更しない — コードを直す
 - `--no-verify` 禁止 — フック失敗時は原因を修正する
+- Hookによる保護ファイルの変更が必要な場合は、自分で編集せずユーザーに理由と変更内容を伝えて確認を取る
 
 ## 実装順序
 
