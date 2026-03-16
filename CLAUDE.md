@@ -44,6 +44,13 @@ uv run pytest tests/ -m integration  # 統合テスト（AWS認証必要）
 - line-length: 120
 - Lefthookでpre-commit時にlint/format自動チェック
 - **TDD**: pytestでテストを先に書き、失敗を確認してから実装する
+- **Conventional Commits**: `<type>: <description>` 形式
+  - `feat:` 新機能
+  - `fix:` バグ修正
+  - `docs:` ドキュメントのみ
+  - `refactor:` リファクタリング
+  - `test:` テスト追加・修正
+  - `chore:` ビルド・設定等の雑務
 
 ## プロジェクト構造
 
