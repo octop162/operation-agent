@@ -11,6 +11,9 @@ file="$(jq -r '.tool_input.file_path // .tool_input.path // empty' <<< "$input")
 
 # Block .env files (secrets)
 case "$file" in
+  *.env.example)
+    # テンプレートファイルは編集可能
+    ;;
   *.env|*.env.*|*/.env|*/.env.*)
     echo "BLOCKED: $file is an environment file containing secrets. Never edit .env files directly." >&2
     exit 2
