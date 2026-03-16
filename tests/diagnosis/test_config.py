@@ -6,7 +6,7 @@ def test_config_defaults():
     from diagnosis.config import DiagnosisConfig
 
     config = DiagnosisConfig()
-    assert config.model_id == "us.anthropic.claude-sonnet-4-20250514"
+    assert config.model_id == "apac.anthropic.claude-sonnet-4-20250514-v1:0"
     assert config.aws_region == "ap-northeast-1"
     assert config.max_tokens == 4096
     assert isinstance(config.temperature, float)
