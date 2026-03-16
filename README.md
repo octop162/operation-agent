@@ -66,3 +66,56 @@ uv run pytest tests/ -m integration
 uv run ruff check src/     # lint
 uv run ruff format src/    # format
 ```
+
+## インフラのデプロイ (AWS CDK)
+
+`infra/` ディレクトリに Python CDK プロジェクトがあります。
+
+### 前提条件
+
+- [Node.js](https://nodejs.org/) 18+（CDK CLI のために必要）
+- AWS CDK CLI: `npm install -g aws-cdk`
+- CDK をデプロイするための IAM 権限（`iam:CreateServiceLinkedRole` 含む）
+
+### セットアップ
+
+```bash
+cd infra
+pip install -r requirements.txt
+```
+
+### Bootstrap（初回のみ）
+
+```bash
+cdk bootstrap aws://ACCOUNT_ID/ap-northeast-1
+```
+
+### デプロイ
+
+```bash
+# dev 環境
+cdk deploy --context env=dev
+
+# prod 環境
+cdk deploy --context env=prod
+```
+
+### 事前準備（SSM パラメータ）
+
+デプロイ前に以下の SSM パラメータを手動で作成してください。
+
+| パラメータ | 説明 |
+|---|---|
+| `/operation-agent/{env}/mysql-lambda-arn` | MySQL 参照 Lambda の ARN |
+
+### テンプレート生成（デプロイなし）
+
+```bash
+cdk synth --context env=dev
+```
+
+### 削除
+
+```bash
+cdk destroy --context env=dev
+```

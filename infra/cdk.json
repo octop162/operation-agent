@@ -1,0 +1,7 @@
+{
+  "app": "python app.py",
+  "context": {
+    "env": "dev",
+    "@aws-cdk/aws-bedrock-agentcore-alpha:allowUnstable": true
+  }
+}
