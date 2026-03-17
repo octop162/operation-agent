@@ -3,7 +3,7 @@ from strands.models.bedrock import BedrockModel
 
 from diagnosis.config import DiagnosisConfig
 from diagnosis.prompts import SYSTEM_PROMPT
-from diagnosis.tools import mysql_query
+from diagnosis.tools import mysql_query, notion_search
 
 
 def create_agent(config: DiagnosisConfig | None = None) -> Agent:
@@ -21,5 +21,5 @@ def create_agent(config: DiagnosisConfig | None = None) -> Agent:
     return Agent(
         model=model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[mysql_query],
+        tools=[mysql_query, notion_search],
     )

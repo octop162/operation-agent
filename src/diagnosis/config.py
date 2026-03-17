@@ -8,3 +8,4 @@ class DiagnosisConfig(BaseSettings):
     max_tokens: int = 4096
     temperature: float = 0.1
     mysql_lambda_function: str = ""
+    notion_api_token: str = ""
