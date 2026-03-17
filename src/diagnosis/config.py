@@ -9,3 +9,5 @@ class DiagnosisConfig(BaseSettings):
     temperature: float = 0.1
     mysql_lambda_function: str = ""
     notion_api_token: str = ""
+    otel_enabled: bool = False
+    otel_exporter: str = "console"  # "console" | "otlp"
