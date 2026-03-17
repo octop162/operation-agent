@@ -61,20 +61,6 @@ def test_iam_role_has_cloudwatch_logs_permission():
     )
 
 
-def test_iam_role_has_lambda_invoke_permission():
-    template = Template.from_stack(make_stack())
-    template.has_resource_properties(
-        "AWS::IAM::Policy",
-        {
-            "PolicyDocument": {
-                "Statement": Match.array_with(
-                    [Match.object_like({"Action": "lambda:InvokeFunction", "Effect": "Allow"})]
-                )
-            }
-        },
-    )
-
-
 def test_prod_iam_role_uses_retain_policy():
     template = Template.from_stack(make_stack("prod"))
     template.has_resource(

@@ -1,0 +1,17 @@
+# CDK アセットバンドル時の再帰コピーを防ぐ
+infra/cdk.out
+infra/.cdk.staging
+cdk.out
+
+# 不要ファイル
+.venv
+.git
+.mypy_cache
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+tests/
+infra/
+*.md
+.env*

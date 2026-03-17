@@ -3,8 +3,6 @@ import os
 import aws_cdk as cdk
 import aws_cdk.aws_bedrock_agentcore_alpha as agentcore
 import aws_cdk.aws_iam as iam
-import aws_cdk.aws_lambda as lambda_
-import aws_cdk.aws_ssm as ssm
 from constructs import Construct
 
 REGION = "ap-northeast-1"
@@ -15,14 +13,6 @@ class OperationAgentStack(cdk.Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         removal_policy = cdk.RemovalPolicy.RETAIN if env_name == "prod" else cdk.RemovalPolicy.DESTROY
-
-        # -------------------------------------------------------------------
-        # 既存の MySQL Query Lambda を参照 (ARN は SSM パラメータから取得)
-        # -------------------------------------------------------------------
-        mysql_lambda_arn = ssm.StringParameter.value_for_string_parameter(
-            self, f"/operation-agent/{env_name}/mysql-lambda-arn"
-        )
-        mysql_fn = lambda_.Function.from_function_arn(self, "MysqlQueryFunction", mysql_lambda_arn)
 
         # -------------------------------------------------------------------
         # AgentCore Runtime 用 IAM ロール
@@ -54,9 +44,6 @@ class OperationAgentStack(cdk.Stack):
                 resources=[f"arn:aws:logs:{REGION}:*:log-group:*"],
             )
         )
-
-        # MySQL Lambda 呼び出し権限
-        mysql_fn.grant_invoke(agent_role)
 
         # -------------------------------------------------------------------
         # AgentCore Runtime
