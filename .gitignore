@@ -35,6 +35,9 @@ venv/
 # ruff
 .ruff_cache/
 
+# CDK
+infra/cdk.out/
+
 # OS
 .DS_Store
 Thumbs.db

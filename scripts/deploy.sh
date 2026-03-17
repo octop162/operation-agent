@@ -27,6 +27,6 @@ echo "--- CDK 依存インストール ---"
 uv pip install -r requirements.txt -q
 
 echo "--- デプロイ実行 ---"
-npx aws-cdk deploy --context "env=${ENV}" --require-approval never
+npx aws-cdk deploy --context "env=${ENV}" --require-approval never --all
 
 echo "=== デプロイ完了 (env=${ENV}) ==="

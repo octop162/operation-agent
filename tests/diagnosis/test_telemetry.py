@@ -1,8 +1,7 @@
 from unittest.mock import MagicMock, patch
 
-from diagnosis.telemetry import setup_telemetry
-
 from diagnosis.config import DiagnosisConfig
+from diagnosis.telemetry import setup_telemetry
 
 
 def test_setup_telemetry_disabled_does_nothing():

@@ -1,15 +1,27 @@
 import logging
 import os
 
+import boto3
 from slack_bolt import App
 
 from slack_bot.agent_client import AgentCoreClient
 
 logger = logging.getLogger(__name__)
 
+
+def _resolve_secret(param_env: str, direct_env: str, default: str = "dummy") -> str:
+    """SSM パラメータ名が環境変数にある場合は SSM から取得し、なければ直接環境変数を参照する。"""
+    param_name = os.environ.get(param_env)
+    if param_name:
+        ssm = boto3.client("ssm", region_name=os.environ.get("AWS_REGION", "ap-northeast-1"))
+        resp = ssm.get_parameter(Name=param_name, WithDecryption=True)
+        return resp["Parameter"]["Value"]
+    return os.environ.get(direct_env, default)
+
+
 app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN", "dummy"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET", "dummy"),
+    token=_resolve_secret("SLACK_BOT_TOKEN_PARAM", "SLACK_BOT_TOKEN"),
+    signing_secret=_resolve_secret("SLACK_SIGNING_SECRET_PARAM", "SLACK_SIGNING_SECRET"),
     process_before_response=True,
     token_verification_enabled=False,
 )

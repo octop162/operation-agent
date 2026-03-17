@@ -25,15 +25,10 @@ class SlackBotStack(cdk.Stack):
         removal_policy = cdk.RemovalPolicy.RETAIN if env_name == "prod" else cdk.RemovalPolicy.DESTROY
 
         # Slack トークンは SSM SecureString で管理 (デプロイ前に手動作成)
-        # CloudFormation dynamic reference でデプロイ時に解決する
-        bot_token = cdk.CfnDynamicReference(
-            cdk.CfnDynamicReferenceService.SSM_SECURE,
-            f"/operation-agent/{env_name}/slack/bot-token",
-        ).to_string()
-        signing_secret = cdk.CfnDynamicReference(
-            cdk.CfnDynamicReferenceService.SSM_SECURE,
-            f"/operation-agent/{env_name}/slack/signing-secret",
-        ).to_string()
+        # CFn は Lambda 環境変数への SSM_SECURE dynamic reference を未サポートのため、
+        # パラメータ名を渡して Lambda 起動時に boto3 で取得する方式を採用
+        bot_token_param = f"/operation-agent/{env_name}/slack/bot-token"
+        signing_secret_param = f"/operation-agent/{env_name}/slack/signing-secret"
 
         # Lambda 関数
         slack_fn = lambda_.Function(
@@ -59,12 +54,25 @@ class SlackBotStack(cdk.Stack):
             timeout=cdk.Duration.minutes(15),
             memory_size=512,
             environment={
-                "SLACK_BOT_TOKEN": bot_token,
-                "SLACK_SIGNING_SECRET": signing_secret,
+                "SLACK_BOT_TOKEN_PARAM": bot_token_param,
+                "SLACK_SIGNING_SECRET_PARAM": signing_secret_param,
                 "AGENT_RUNTIME_ARN": agent_runtime_arn,
             },
         )
         slack_fn.apply_removal_policy(removal_policy)
+
+        # SSM SecureString パラメータの読み取り権限
+        slack_fn.add_to_role_policy(
+            iam.PolicyStatement(
+                sid="SsmGetSlackSecrets",
+                effect=iam.Effect.ALLOW,
+                actions=["ssm:GetParameter"],
+                resources=[
+                    f"arn:aws:ssm:{REGION}:{self.account}:parameter{bot_token_param}",
+                    f"arn:aws:ssm:{REGION}:{self.account}:parameter{signing_secret_param}",
+                ],
+            )
+        )
 
         # lazy listener が自分自身を非同期 invoke するために必要
         # function_arn を直接参照すると循環依存になるため format_arn で構築する
