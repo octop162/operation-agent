@@ -16,12 +16,6 @@ fi
 echo "=== operation-agent デプロイ (env=${ENV}) ==="
 
 # 前提チェック
-if ! command -v cdk &>/dev/null; then
-    echo "ERROR: AWS CDK CLI がインストールされていません"
-    echo "  npm install -g aws-cdk"
-    exit 1
-fi
-
 if ! aws sts get-caller-identity &>/dev/null; then
     echo "ERROR: AWS 認証情報が設定されていません"
     exit 1
@@ -33,6 +27,6 @@ echo "--- CDK 依存インストール ---"
 pip install -r requirements.txt -q
 
 echo "--- デプロイ実行 ---"
-cdk deploy --context "env=${ENV}" --require-approval never
+npx aws-cdk deploy --context "env=${ENV}" --require-approval never
 
 echo "=== デプロイ完了 (env=${ENV}) ==="
