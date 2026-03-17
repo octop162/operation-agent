@@ -24,7 +24,7 @@ fi
 # CDK デプロイ (Dockerfile のビルド・ECR プッシュ・AgentCore Runtime 作成を含む)
 cd "$PROJECT_ROOT/infra"
 echo "--- CDK 依存インストール ---"
-pip install -r requirements.txt -q
+uv pip install -r requirements.txt -q
 
 echo "--- デプロイ実行 ---"
 npx aws-cdk deploy --context "env=${ENV}" --require-approval never
