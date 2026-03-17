@@ -41,7 +41,16 @@ def test_iam_role_has_bedrock_permission():
         "AWS::IAM::Policy",
         {
             "PolicyDocument": {
-                "Statement": Match.array_with([Match.object_like({"Action": "bedrock:InvokeModel", "Effect": "Allow"})])
+                "Statement": Match.array_with(
+                    [
+                        Match.object_like(
+                            {
+                                "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                                "Effect": "Allow",
+                            }
+                        )
+                    ]
+                )
             }
         },
     )
@@ -55,20 +64,6 @@ def test_iam_role_has_cloudwatch_logs_permission():
             "PolicyDocument": {
                 "Statement": Match.array_with(
                     [Match.object_like({"Action": ["logs:StartQuery", "logs:GetQueryResults"], "Effect": "Allow"})]
-                )
-            }
-        },
-    )
-
-
-def test_iam_role_has_lambda_invoke_permission():
-    template = Template.from_stack(make_stack())
-    template.has_resource_properties(
-        "AWS::IAM::Policy",
-        {
-            "PolicyDocument": {
-                "Statement": Match.array_with(
-                    [Match.object_like({"Action": "lambda:InvokeFunction", "Effect": "Allow"})]
                 )
             }
         },

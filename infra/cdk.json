@@ -1,5 +1,5 @@
 {
-  "app": "python app.py",
+  "app": "uv run python app.py",
   "context": {
     "env": "dev",
     "@aws-cdk/aws-bedrock-agentcore-alpha:allowUnstable": true
