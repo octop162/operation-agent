@@ -6,11 +6,10 @@ WORKDIR /app
 
 # uv でパッケージインストール
 COPY pyproject.toml uv.lock ./
+COPY src/ ./src/
 RUN pip install --no-cache-dir uv && \
     uv sync --no-dev --frozen
 
-# アプリケーションコードをコピー
-COPY src/ ./src/
-
 # AgentCore が呼び出すエントリポイント (HTTP サーバ, ポート 8080)
-CMD ["uv", "run", "python", "-m", "diagnosis"]
+# uv run を避け .venv を直接使うことで起動時の再 sync を防ぐ
+CMD ["/app/.venv/bin/python", "-m", "diagnosis"]

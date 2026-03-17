@@ -41,7 +41,16 @@ def test_iam_role_has_bedrock_permission():
         "AWS::IAM::Policy",
         {
             "PolicyDocument": {
-                "Statement": Match.array_with([Match.object_like({"Action": "bedrock:InvokeModel", "Effect": "Allow"})])
+                "Statement": Match.array_with(
+                    [
+                        Match.object_like(
+                            {
+                                "Action": ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                                "Effect": "Allow",
+                            }
+                        )
+                    ]
+                )
             }
         },
     )

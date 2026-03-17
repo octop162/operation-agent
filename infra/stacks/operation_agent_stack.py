@@ -2,6 +2,7 @@ import os
 
 import aws_cdk as cdk
 import aws_cdk.aws_bedrock_agentcore_alpha as agentcore
+import aws_cdk.aws_ecr_assets as ecr_assets  # noqa: F401 – used via agentcore.AgentRuntimeArtifact.from_asset
 import aws_cdk.aws_iam as iam
 from constructs import Construct
 
@@ -20,18 +21,22 @@ class OperationAgentStack(cdk.Stack):
         agent_role = iam.Role(
             self,
             "AgentRuntimeRole",
-            assumed_by=iam.ServicePrincipal("bedrock.amazonaws.com"),
+            assumed_by=iam.ServicePrincipal("bedrock-agentcore.amazonaws.com"),
             description=f"Execution role for operation-agent AgentCore Runtime ({env_name})",
         )
         agent_role.apply_removal_policy(removal_policy)
 
-        # Bedrock モデル呼び出し権限
+        # Bedrock モデル呼び出し権限 (InvokeModel + ConverseStream で必要な InvokeModelWithResponseStream)
         agent_role.add_to_policy(
             iam.PolicyStatement(
                 sid="BedrockInvokeModel",
                 effect=iam.Effect.ALLOW,
-                actions=["bedrock:InvokeModel"],
-                resources=[f"arn:aws:bedrock:{REGION}::foundation-model/anthropic.claude-*"],
+                actions=["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
+                resources=[
+                    # apac cross-region inference profile は複数リージョン (ap-northeast-1/2 など) を経由するため * を使用
+                    "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
+                    "arn:aws:bedrock:*:*:inference-profile/*anthropic.claude-*",
+                ],
             )
         )
 
@@ -50,7 +55,10 @@ class OperationAgentStack(cdk.Stack):
         # -------------------------------------------------------------------
         # Dockerfile はプロジェクトルート (infra/ の 2 階層上) に置く
         project_root = os.path.join(os.path.dirname(__file__), "../..")
-        artifact = agentcore.AgentRuntimeArtifact.from_asset(project_root)
+        artifact = agentcore.AgentRuntimeArtifact.from_asset(
+            project_root,
+            platform=ecr_assets.Platform.LINUX_ARM64,
+        )
 
         agentcore.Runtime(
             self,
