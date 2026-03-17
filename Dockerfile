@@ -12,5 +12,5 @@ RUN pip install --no-cache-dir uv && \
 # アプリケーションコードをコピー
 COPY src/ ./src/
 
-# AgentCore が呼び出すエントリポイント (#7 で HTTP サーバ化)
-CMD ["uv", "run", "python", "-m", "diagnosis.agent"]
+# AgentCore が呼び出すエントリポイント (HTTP サーバ, ポート 8080)
+CMD ["uv", "run", "python", "-m", "diagnosis"]
