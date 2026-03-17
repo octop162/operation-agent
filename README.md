@@ -119,3 +119,62 @@ cdk synth --context env=dev
 ```bash
 cdk destroy --context env=dev
 ```
+
+## Slack Bot のセットアップ
+
+### 1. Slack App の作成
+
+1. [api.slack.com/apps](https://api.slack.com/apps) を開き "Create New App" → "From an app manifest" を選択
+2. `slack_app_manifest.json` の内容を貼り付けてアプリを作成
+3. "Install to Workspace" でワークスペースにインストール
+
+### 2. トークンの取得
+
+| 項目 | 場所 |
+|------|------|
+| Bot Token (`xoxb-...`) | "OAuth & Permissions" → "Bot User OAuth Token" |
+| Signing Secret | "Basic Information" → "App Credentials" → "Signing Secret" |
+
+### 3. SSM パラメータの登録
+
+```bash
+ENV=dev  # または prod
+
+aws ssm put-parameter \
+  --name "/operation-agent/${ENV}/slack/bot-token" \
+  --type SecureString \
+  --value "xoxb-xxxxxxxxxxxx"
+
+aws ssm put-parameter \
+  --name "/operation-agent/${ENV}/slack/signing-secret" \
+  --type SecureString \
+  --value "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+### 4. AgentCore Runtime ARN の取得
+
+```bash
+export AGENT_RUNTIME_ARN=$(uv run python test_agentcore.py --env ${ENV} 2>&1 \
+  | grep "^ARN:" | awk '{print $2}')
+echo $AGENT_RUNTIME_ARN
+```
+
+### 5. SlackBotStack のデプロイ
+
+```bash
+cd infra
+AGENT_RUNTIME_ARN=$AGENT_RUNTIME_ARN npx aws-cdk deploy SlackBot${ENV^}Stack --context env=${ENV}
+```
+
+デプロイ後、出力の `SlackEndpointUrl` をメモします。
+
+### 6. Slack App に URL を設定
+
+1. "Event Subscriptions" を開き "Enable Events" をオン
+2. "Request URL" に `SlackEndpointUrl` を入力（Verified と表示されれば OK）
+3. "Subscribe to bot events" に `app_mention` が追加されていることを確認
+4. "Save Changes" → "Reinstall to Workspace"
+
+### 確認
+
+ボットをチャンネルに招待して `@<ボット名> DBが重い` などとメンションすると、スレッドに「調査中...」が投稿され、診断結果に更新されます。
