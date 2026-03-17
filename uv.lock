@@ -2222,6 +2222,7 @@ dependencies = [
     { name = "botocore", extra = ["crt"] },
     { name = "notion-client" },
     { name = "pydantic-settings" },
+    { name = "slack-bolt" },
     { name = "strands-agents" },
     { name = "strands-agents-tools" },
 ]
@@ -2247,6 +2248,7 @@ requires-dist = [
     { name = "botocore", extras = ["crt"], specifier = ">=1.42.68" },
     { name = "notion-client", specifier = ">=2.2.1" },
     { name = "pydantic-settings", specifier = ">=2.0" },
+    { name = "slack-bolt", specifier = ">=1.18.0" },
     { name = "strands-agents", specifier = ">=1.30.0" },
     { name = "strands-agents-tools", specifier = ">=0.2.22" },
 ]
