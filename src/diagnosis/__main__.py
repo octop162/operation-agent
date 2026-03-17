@@ -3,6 +3,9 @@
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
 from diagnosis.agent import create_agent
+from diagnosis.telemetry import setup_telemetry
+
+setup_telemetry()
 
 app = BedrockAgentCoreApp()
 
