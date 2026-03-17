@@ -13,6 +13,7 @@ dependencies = [
     "boto3>=1.38.0",
     "pydantic-settings>=2.0",
     "botocore[crt]>=1.42.68",
+    "bedrock-agentcore>=0.1.0",
 ]
 
 [dependency-groups]
