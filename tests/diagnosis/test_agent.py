@@ -70,6 +70,19 @@ def test_create_agent_with_session_id_uses_s3_session_manager():
     )
 
 
+def test_create_agent_enables_prompt_cache():
+    with patch("diagnosis.agent.BedrockModel") as mock_model_cls:
+        mock_model_cls.return_value = MagicMock()
+
+        from diagnosis.agent import create_agent
+
+        create_agent()
+
+    call_kwargs = mock_model_cls.call_args.kwargs
+    assert call_kwargs["cache_prompt"] == "default"
+    assert call_kwargs["cache_tools"] == "default"
+
+
 def test_create_agent_without_session_id_skips_s3_session_manager():
     with (
         patch("diagnosis.agent.BedrockModel") as mock_model_cls,
