@@ -16,7 +16,7 @@ class AgentCoreClient:
         response = self._client.invoke_agent_runtime(
             agentRuntimeArn=self._runtime_arn,
             runtimeSessionId=session_id,
-            payload=json.dumps({"prompt": prompt}).encode(),
+            payload=json.dumps({"prompt": prompt, "session_id": session_id}).encode(),
             qualifier="DEFAULT",
         )
         return json.loads(response["response"].read())["result"]

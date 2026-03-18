@@ -27,7 +27,6 @@ def test_process_mention_posts_investigating_message():
 
     say = MagicMock(return_value={"ts": "ts_investigating"})
     client = MagicMock()
-    client.conversations_replies.return_value = {"messages": []}
 
     with patch("slack_bot.app._get_agent_client") as mock_get:
         agent_client = MagicMock()
@@ -44,7 +43,6 @@ def test_process_mention_replies_in_thread_with_thread_ts():
 
     say = MagicMock(return_value={"ts": "ts_investigating"})
     client = MagicMock()
-    client.conversations_replies.return_value = {"messages": []}
 
     with patch("slack_bot.app._get_agent_client") as mock_get:
         agent_client = MagicMock()
@@ -61,7 +59,6 @@ def test_process_mention_updates_investigating_message():
 
     say = MagicMock(return_value={"ts": "ts_investigating"})
     client = MagicMock()
-    client.conversations_replies.return_value = {"messages": []}
 
     with patch("slack_bot.app._get_agent_client") as mock_get:
         agent_client = MagicMock()
@@ -81,7 +78,6 @@ def test_process_mention_invokes_agent_with_prompt():
 
     say = MagicMock(return_value={"ts": "ts_investigating"})
     client = MagicMock()
-    client.conversations_replies.return_value = {"messages": []}
 
     with patch("slack_bot.app._get_agent_client") as mock_get:
         agent_client = MagicMock()
@@ -92,7 +88,23 @@ def test_process_mention_invokes_agent_with_prompt():
 
     agent_client.invoke.assert_called_once()
     call_kwargs = agent_client.invoke.call_args[1]
-    assert "DBが重い" in call_kwargs["prompt"] or "DBが重い" in str(agent_client.invoke.call_args)
+    assert "DBが重い" in call_kwargs["prompt"]
+
+
+def test_process_mention_does_not_fetch_thread_history():
+    from slack_bot.app import process_mention
+
+    say = MagicMock(return_value={"ts": "ts_investigating"})
+    client = MagicMock()
+
+    with patch("slack_bot.app._get_agent_client") as mock_get:
+        agent_client = MagicMock()
+        agent_client.invoke.return_value = "OK"
+        mock_get.return_value = agent_client
+
+        process_mention(say=say, event=_make_event(), client=client)
+
+    client.conversations_replies.assert_not_called()
 
 
 def test_process_mention_handles_agent_error_gracefully():
@@ -100,7 +112,6 @@ def test_process_mention_handles_agent_error_gracefully():
 
     say = MagicMock(return_value={"ts": "ts_investigating"})
     client = MagicMock()
-    client.conversations_replies.return_value = {"messages": []}
 
     with patch("slack_bot.app._get_agent_client") as mock_get:
         agent_client = MagicMock()

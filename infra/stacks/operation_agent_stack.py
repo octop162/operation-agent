@@ -4,6 +4,7 @@ import aws_cdk as cdk
 import aws_cdk.aws_bedrock_agentcore_alpha as agentcore
 import aws_cdk.aws_ecr_assets as ecr_assets  # noqa: F401 – used via agentcore.AgentRuntimeArtifact.from_asset
 import aws_cdk.aws_iam as iam
+import aws_cdk.aws_s3 as s3
 from constructs import Construct
 
 REGION = "ap-northeast-1"
@@ -14,6 +15,16 @@ class OperationAgentStack(cdk.Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         removal_policy = cdk.RemovalPolicy.RETAIN if env_name == "prod" else cdk.RemovalPolicy.DESTROY
+
+        # -------------------------------------------------------------------
+        # S3 セッションバケット（会話履歴の永続化）
+        # -------------------------------------------------------------------
+        session_bucket = s3.Bucket(
+            self,
+            "SessionBucket",
+            removal_policy=removal_policy,
+            auto_delete_objects=removal_policy == cdk.RemovalPolicy.DESTROY,
+        )
 
         # -------------------------------------------------------------------
         # AgentCore Runtime 用 IAM ロール
@@ -40,6 +51,16 @@ class OperationAgentStack(cdk.Stack):
             )
         )
 
+        # X-Ray トレース権限 (ADOT による OTel トレース送信)
+        agent_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="XRayTracing",
+                effect=iam.Effect.ALLOW,
+                actions=["xray:PutTraceSegments", "xray:PutTelemetryRecords"],
+                resources=["*"],
+            )
+        )
+
         # CloudWatch Logs Insights 権限
         agent_role.add_to_policy(
             iam.PolicyStatement(
@@ -47,6 +68,24 @@ class OperationAgentStack(cdk.Stack):
                 effect=iam.Effect.ALLOW,
                 actions=["logs:StartQuery", "logs:GetQueryResults"],
                 resources=[f"arn:aws:logs:{REGION}:*:log-group:*"],
+            )
+        )
+
+        # S3 セッションバケット読み書き権限
+        agent_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="S3SessionReadWrite",
+                effect=iam.Effect.ALLOW,
+                actions=["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+                resources=[session_bucket.arn_for_objects("*")],
+            )
+        )
+        agent_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="S3SessionList",
+                effect=iam.Effect.ALLOW,
+                actions=["s3:ListBucket"],
+                resources=[session_bucket.bucket_arn],
             )
         )
 
@@ -67,4 +106,12 @@ class OperationAgentStack(cdk.Stack):
             agent_runtime_artifact=artifact,
             execution_role=agent_role,
             description=f"operation-agent Strands Agents runtime ({env_name})",
+            environment_variables={
+                "OTEL_PYTHON_DISTRO": "aws_distro",
+                "OTEL_PYTHON_CONFIGURATOR": "aws_configurator",
+                "OTEL_SERVICE_NAME": f"operation-agent-{env_name}",
+                "OTEL_EXPORTER_OTLP_ENDPOINT": f"https://xray.{REGION}.amazonaws.com",
+                "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+                "DIAG_SESSION_BUCKET": session_bucket.bucket_name,
+            },
         )

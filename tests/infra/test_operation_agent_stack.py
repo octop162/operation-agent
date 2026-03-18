@@ -84,3 +84,47 @@ def test_dev_iam_role_uses_delete_policy():
         "AWS::IAM::Role",
         {"DeletionPolicy": "Delete"},
     )
+
+
+def test_session_bucket_exists():
+    template = Template.from_stack(make_stack())
+    template.resource_count_is("AWS::S3::Bucket", 1)
+
+
+def test_session_bucket_uses_delete_policy_in_dev():
+    template = Template.from_stack(make_stack("dev"))
+    template.has_resource("AWS::S3::Bucket", {"DeletionPolicy": "Delete"})
+
+
+def test_session_bucket_uses_retain_policy_in_prod():
+    template = Template.from_stack(make_stack("prod"))
+    template.has_resource("AWS::S3::Bucket", {"DeletionPolicy": "Retain"})
+
+
+def test_iam_role_has_s3_session_permission():
+    template = Template.from_stack(make_stack())
+    template.has_resource_properties(
+        "AWS::IAM::Policy",
+        {
+            "PolicyDocument": {
+                "Statement": Match.array_with(
+                    [
+                        Match.object_like(
+                            {
+                                "Action": Match.array_with(["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]),
+                                "Effect": "Allow",
+                            }
+                        )
+                    ]
+                )
+            }
+        },
+    )
+
+
+def test_agentcore_runtime_has_session_bucket_env():
+    template = Template.from_stack(make_stack())
+    template.has_resource_properties(
+        "AWS::BedrockAgentCore::Runtime",
+        {"EnvironmentVariables": Match.object_like({"DIAG_SESSION_BUCKET": Match.any_value()})},
+    )

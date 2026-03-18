@@ -9,19 +9,12 @@ setup_telemetry()
 
 app = BedrockAgentCoreApp()
 
-_agent = None
-
-
-def _get_agent():
-    global _agent
-    if _agent is None:
-        _agent = create_agent()
-    return _agent
-
 
 def _handle(payload: dict) -> dict:
     user_message = payload.get("prompt", "")
-    result = _get_agent()(user_message)
+    session_id = payload.get("session_id")
+    agent = create_agent(session_id=session_id)
+    result = agent(user_message)
     return {"result": str(result)}
 
 
