@@ -80,6 +80,7 @@ class SlackBotStack(cdk.Stack):
             service="lambda",
             resource="function",
             resource_name=f"operation-agent-slack-bot-{env_name}",
+            arn_format=cdk.ArnFormat.COLON_RESOURCE_NAME,
         )
         slack_fn.add_to_role_policy(
             iam.PolicyStatement(
@@ -96,7 +97,7 @@ class SlackBotStack(cdk.Stack):
                 sid="AgentCoreInvoke",
                 effect=iam.Effect.ALLOW,
                 actions=["bedrock-agentcore:InvokeAgentRuntime"],
-                resources=[f"arn:aws:bedrock-agentcore:{REGION}:*:agent-runtime/*"],
+                resources=[f"arn:aws:bedrock-agentcore:{REGION}:{self.account}:runtime/*"],
             )
         )
 

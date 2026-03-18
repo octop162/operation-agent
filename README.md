@@ -164,19 +164,10 @@ aws ssm put-parameter \
   --value "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
 
-### 4. AgentCore Runtime ARN の取得
+### 4. SlackBotStack のデプロイ
 
 ```bash
-export AGENT_RUNTIME_ARN=$(uv run python test_agentcore.py --env ${ENV} 2>&1 \
-  | grep "^ARN:" | awk '{print $2}')
-echo $AGENT_RUNTIME_ARN
-```
-
-### 5. SlackBotStack のデプロイ
-
-```bash
-cd infra
-AGENT_RUNTIME_ARN=$AGENT_RUNTIME_ARN npx aws-cdk deploy SlackBot${ENV^}Stack --context env=${ENV}
+./scripts/deploy_slack.sh
 ```
 
 デプロイ後、出力の `SlackEndpointUrl` をメモします。
