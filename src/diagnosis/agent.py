@@ -4,7 +4,7 @@ from strands.session.s3_session_manager import S3SessionManager
 
 from diagnosis.config import DiagnosisConfig
 from diagnosis.prompts import SYSTEM_PROMPT
-from diagnosis.tools import cwl_insights, mysql_query, notion_search
+from diagnosis.tools import cwl_insights, notion_get_page, notion_search
 
 
 def create_agent(config: DiagnosisConfig | None = None, session_id: str | None = None) -> Agent:
@@ -33,6 +33,6 @@ def create_agent(config: DiagnosisConfig | None = None, session_id: str | None =
     return Agent(
         model=model,
         system_prompt=SYSTEM_PROMPT,
-        tools=[mysql_query, notion_search, cwl_insights],
+        tools=[notion_search, notion_get_page, cwl_insights],
         **kwargs,
     )
