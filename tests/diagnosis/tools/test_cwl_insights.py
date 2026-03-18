@@ -191,6 +191,36 @@ def test_cwl_insights_uses_region_from_config(monkeypatch):
     mock_boto.assert_called_once_with("logs", region_name="us-west-2")
 
 
+def test_cwl_insights_rejects_millisecond_timestamps():
+    """ミリ秒タイムスタンプ（13桁）を渡した場合にValueErrorを送出する"""
+    from diagnosis.tools.cwl_insights import cwl_insights
+
+    # 現在時刻のミリ秒タイムスタンプ（13桁）
+    start_ms = 1700000000000
+    end_ms = 1700003600000
+
+    with pytest.raises(ValueError, match="[Uu]nix秒|seconds|timestamp"):
+        cwl_insights(
+            log_group_names=["/aws/lambda/my-func"],
+            query_string="fields @message",
+            start_time=start_ms,
+            end_time=end_ms,
+        )
+
+
+def test_cwl_insights_rejects_end_before_start():
+    """end_time が start_time より前の場合に ValueError を送出する"""
+    from diagnosis.tools.cwl_insights import cwl_insights
+
+    with pytest.raises(ValueError, match="end_time|start_time"):
+        cwl_insights(
+            log_group_names=["/aws/lambda/my-func"],
+            query_string="fields @message",
+            start_time=1700003600,
+            end_time=1700000000,
+        )
+
+
 @pytest.mark.integration
 def test_cwl_insights_integration():
     """実際のAWS CloudWatch Logs InsightsへのE2Eテスト（AWS認証必要）"""

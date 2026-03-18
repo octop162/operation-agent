@@ -11,6 +11,21 @@ _POLL_INTERVAL_SECONDS = 1
 _POLL_MAX_ATTEMPTS = 30
 _TERMINAL_STATUSES = {"Complete", "Failed", "Cancelled"}
 
+# Unix秒として妥当な上限（10桁）: ミリ秒（13桁）を誤って渡した場合に検出する
+_MAX_UNIX_SECONDS = 9_999_999_999
+
+
+def _validate_timestamps(start_time: int, end_time: int) -> None:
+    if start_time > _MAX_UNIX_SECONDS or end_time > _MAX_UNIX_SECONDS:
+        raise ValueError(
+            f"start_time/end_time はUnix秒で指定してください（ミリ秒ではなく）。"
+            f" 受け取った値: start_time={start_time}, end_time={end_time}"
+        )
+    if end_time < start_time:
+        raise ValueError(
+            f"end_time は start_time 以降の値を指定してください。 start_time={start_time}, end_time={end_time}"
+        )
+
 
 @tool
 def cwl_insights(
@@ -32,6 +47,7 @@ def cwl_insights(
     Returns:
         クエリ結果をJSON文字列として返す。{"status": "Complete", "results": [...], "statistics": {...}}
     """
+    _validate_timestamps(start_time, end_time)
     config = DiagnosisConfig()
     client = boto3.client("logs", region_name=config.aws_region)
 
