@@ -71,6 +71,19 @@ class OperationAgentStack(cdk.Stack):
             )
         )
 
+        # Notion API キー（SSM SecureString）読み取り権限
+        notion_param = f"/operation-agent/{env_name}/notion/api-key"
+        agent_role.add_to_policy(
+            iam.PolicyStatement(
+                sid="SsmGetNotionApiKey",
+                effect=iam.Effect.ALLOW,
+                actions=["ssm:GetParameter"],
+                resources=[
+                    f"arn:aws:ssm:{REGION}:{self.account}:parameter{notion_param}",
+                ],
+            )
+        )
+
         # S3 セッションバケット読み書き権限
         agent_role.add_to_policy(
             iam.PolicyStatement(
@@ -113,5 +126,6 @@ class OperationAgentStack(cdk.Stack):
                 "OTEL_EXPORTER_OTLP_ENDPOINT": f"https://xray.{REGION}.amazonaws.com",
                 "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
                 "DIAG_SESSION_BUCKET": session_bucket.bucket_name,
+                "DIAG_NOTION_API_TOKEN_PARAM": notion_param,
             },
         )

@@ -128,3 +128,37 @@ def test_agentcore_runtime_has_session_bucket_env():
         "AWS::BedrockAgentCore::Runtime",
         {"EnvironmentVariables": Match.object_like({"DIAG_SESSION_BUCKET": Match.any_value()})},
     )
+
+
+def test_agentcore_runtime_has_notion_api_token_param_env():
+    template = Template.from_stack(make_stack())
+    template.has_resource_properties(
+        "AWS::BedrockAgentCore::Runtime",
+        {
+            "EnvironmentVariables": Match.object_like(
+                {"DIAG_NOTION_API_TOKEN_PARAM": "/operation-agent/dev/notion/api-key"}
+            )
+        },
+    )
+
+
+def test_iam_role_has_ssm_notion_permission():
+    template = Template.from_stack(make_stack())
+    template.has_resource_properties(
+        "AWS::IAM::Policy",
+        {
+            "PolicyDocument": {
+                "Statement": Match.array_with(
+                    [
+                        Match.object_like(
+                            {
+                                "Sid": "SsmGetNotionApiKey",
+                                "Action": "ssm:GetParameter",
+                                "Effect": "Allow",
+                            }
+                        )
+                    ]
+                )
+            }
+        },
+    )
