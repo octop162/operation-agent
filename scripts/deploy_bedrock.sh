@@ -15,6 +15,9 @@ fi
 
 echo "=== operation-agent デプロイ (env=${ENV}) ==="
 
+# Docker QEMU エミュレーションを有効化 (マルチアーキテクチャビルドのため)
+# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
 # 前提チェック
 if ! aws sts get-caller-identity &>/dev/null; then
     echo "ERROR: AWS 認証情報が設定されていません"
@@ -27,6 +30,6 @@ echo "--- CDK 依存インストール ---"
 uv pip install -r requirements.txt -q
 
 echo "--- デプロイ実行 ---"
-npx aws-cdk deploy --context "env=${ENV}" --require-approval never --all
+npx aws-cdk deploy OperationAgent${ENV^}Stack --context "env=${ENV}" --require-approval never
 
 echo "=== デプロイ完了 (env=${ENV}) ==="

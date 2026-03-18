@@ -59,19 +59,7 @@ def process_mention(say, event, client) -> None:  # type: ignore[no-untyped-def]
     posted = say(text="調査中...", thread_ts=thread_ts)
     investigating_ts = posted["ts"]
 
-    # スレッド履歴からコンテキストを構築
-    try:
-        history = client.conversations_replies(channel=channel, ts=thread_ts)
-        messages = history.get("messages", [])
-        context_lines = [
-            f"{m.get('user', 'bot')}: {m.get('text', '')}"
-            for m in messages[-10:]
-            if m.get("text") and not m.get("text", "").startswith("調査中")
-        ]
-        prompt = "\n".join(context_lines) if len(context_lines) > 1 else event.get("text", "")
-    except Exception:
-        logger.exception("スレッド履歴の取得に失敗しました")
-        prompt = event.get("text", "")
+    prompt = event.get("text", "")
 
     # AgentCore Runtime を呼び出し
     session_id = _make_session_id(channel, thread_ts)

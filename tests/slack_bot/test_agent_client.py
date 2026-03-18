@@ -3,6 +3,7 @@ from io import BytesIO
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from slack_bot.agent_client import AgentCoreClient
 
 
@@ -35,7 +36,7 @@ def test_invoke_sends_correct_payload(mock_boto3_client):
     AgentCoreClient(runtime_arn="arn:test").invoke("診断してください", session_id="a" * 33)
 
     call_kwargs = client_instance.invoke_agent_runtime.call_args[1]
-    assert json.loads(call_kwargs["payload"]) == {"prompt": "診断してください"}
+    assert json.loads(call_kwargs["payload"]) == {"prompt": "診断してください", "session_id": "a" * 33}
     assert call_kwargs["qualifier"] == "DEFAULT"
     assert call_kwargs["agentRuntimeArn"] == "arn:test"
 
