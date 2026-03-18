@@ -162,6 +162,11 @@ aws ssm put-parameter \
   --name "/operation-agent/${ENV}/slack/signing-secret" \
   --type SecureString \
   --value "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+aws ssm put-parameter \
+  --name "/operation-agent/${ENV}/notion/api-key" \
+  --type SecureString \
+  --value "secret_xxxxxxxxxxxx"
 ```
 
 ### 4. SlackBotStack のデプロイ
