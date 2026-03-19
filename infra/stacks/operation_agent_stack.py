@@ -125,6 +125,8 @@ class OperationAgentStack(cdk.Stack):
                 "OTEL_SERVICE_NAME": f"operation-agent-{env_name}",
                 "OTEL_EXPORTER_OTLP_ENDPOINT": f"https://xray.{REGION}.amazonaws.com",
                 "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+                "DIAG_OTEL_ENABLED": "true",
+                "DIAG_OTEL_EXPORTER": "otlp",
                 "DIAG_SESSION_BUCKET": session_bucket.bucket_name,
                 "DIAG_NOTION_API_TOKEN_PARAM": notion_param,
             },
