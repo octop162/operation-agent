@@ -73,4 +73,38 @@ def process_mention(say, event, client) -> None:  # type: ignore[no-untyped-def]
     client.chat_update(channel=channel, ts=investigating_ts, text=result)
 
 
+def handle_reaction_added(ack) -> None:  # type: ignore[no-untyped-def]
+    """Slack の 3 秒タイムアウト回避のために即時 ACK を返す。"""
+    ack()
+
+
+def process_reaction_added(event, client, say) -> None:  # type: ignore[no-untyped-def]
+    """:eyes: リアクションを受けたメッセージを診断する (lazy listener で非同期実行)。"""
+    if event.get("reaction") != "eyes":
+        return
+
+    item = event["item"]
+    channel = item["channel"]
+    ts = item["ts"]
+
+    # リアクションされたメッセージ本文を取得
+    resp = client.conversations_history(channel=channel, latest=ts, limit=1, inclusive=True)
+    messages = resp.get("messages", [])
+    prompt = messages[0].get("text", "") if messages else ""
+
+    # 先に「調査中...」を投稿して ts を保存
+    posted = say(text="調査中...", thread_ts=ts)
+    investigating_ts = posted["ts"]
+
+    session_id = _make_session_id(channel, ts)
+    try:
+        result = _get_agent_client().invoke(prompt=prompt, session_id=session_id)
+    except Exception as exc:
+        logger.exception("AgentCore の呼び出しに失敗しました")
+        result = f"エラーが発生しました: {exc}"
+
+    client.chat_update(channel=channel, ts=investigating_ts, text=result)
+
+
 app.event("app_mention")(ack=handle_mention, lazy=[process_mention])
+app.event("reaction_added")(ack=handle_reaction_added, lazy=[process_reaction_added])
