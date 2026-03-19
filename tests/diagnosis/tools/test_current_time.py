@@ -6,8 +6,9 @@ def test_current_time_tool_exists():
 
 
 def test_current_time_is_strands_tool():
-    from diagnosis.tools.current_time import get_current_time
     from strands.tools.decorator import DecoratedFunctionTool
+
+    from diagnosis.tools.current_time import get_current_time
 
     assert isinstance(get_current_time, DecoratedFunctionTool)
 

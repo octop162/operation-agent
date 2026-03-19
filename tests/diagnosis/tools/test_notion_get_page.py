@@ -9,8 +9,9 @@ def test_notion_get_page_tool_exists():
 
 
 def test_notion_get_page_is_strands_tool():
-    from diagnosis.tools.notion_get_page import notion_get_page
     from strands.tools.decorator import DecoratedFunctionTool
+
+    from diagnosis.tools.notion_get_page import notion_get_page
 
     assert isinstance(notion_get_page, DecoratedFunctionTool)
 
