@@ -16,7 +16,8 @@
         "app_mentions:read",
         "chat:write",
         "channels:history",
-        "groups:history"
+        "groups:history",
+        "reactions:read"
       ]
     }
   },
@@ -24,7 +25,8 @@
     "event_subscriptions": {
       "request_url": "https://<API_GATEWAY_URL>/slack/events",
       "bot_events": [
-        "app_mention"
+        "app_mention",
+        "reaction_added"
       ]
     },
     "interactivity": {
