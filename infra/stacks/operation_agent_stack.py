@@ -5,6 +5,7 @@ import aws_cdk.aws_bedrock_agentcore_alpha as agentcore
 import aws_cdk.aws_ecr_assets as ecr_assets  # noqa: F401 – used via agentcore.AgentRuntimeArtifact.from_asset
 import aws_cdk.aws_iam as iam
 import aws_cdk.aws_s3 as s3
+from aws_cdk.mixins_preview.aws_bedrockagentcore import mixins as agentcore_mixins  # noqa: F401
 from constructs import Construct
 
 REGION = "ap-northeast-1"
@@ -48,16 +49,6 @@ class OperationAgentStack(cdk.Stack):
                     "arn:aws:bedrock:*::foundation-model/anthropic.claude-*",
                     "arn:aws:bedrock:*:*:inference-profile/*anthropic.claude-*",
                 ],
-            )
-        )
-
-        # X-Ray トレース権限 (ADOT による OTel トレース送信)
-        agent_role.add_to_policy(
-            iam.PolicyStatement(
-                sid="XRayTracing",
-                effect=iam.Effect.ALLOW,
-                actions=["xray:PutTraceSegments", "xray:PutTelemetryRecords"],
-                resources=["*"],
             )
         )
 
@@ -112,7 +103,7 @@ class OperationAgentStack(cdk.Stack):
             platform=ecr_assets.Platform.LINUX_ARM64,
         )
 
-        agentcore.Runtime(
+        runtime = agentcore.Runtime(
             self,
             "AgentRuntime",
             runtime_name=f"operation_agent_{env_name}",
@@ -120,11 +111,8 @@ class OperationAgentStack(cdk.Stack):
             execution_role=agent_role,
             description=f"operation-agent Strands Agents runtime ({env_name})",
             environment_variables={
-                "OTEL_PYTHON_DISTRO": "aws_distro",
-                "OTEL_PYTHON_CONFIGURATOR": "aws_configurator",
                 "OTEL_SERVICE_NAME": f"operation-agent-{env_name}",
-                "OTEL_EXPORTER_OTLP_ENDPOINT": f"https://xray.{REGION}.amazonaws.com",
-                "OTEL_EXPORTER_OTLP_PROTOCOL": "http/protobuf",
+                "AGENT_OBSERVABILITY_ENABLED": "true",
                 "DIAG_OTEL_ENABLED": "true",
                 "DIAG_OTEL_EXPORTER": "otlp",
                 "DIAG_SESSION_BUCKET": session_bucket.bucket_name,
