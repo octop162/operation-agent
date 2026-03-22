@@ -3,9 +3,9 @@ from pydantic import ValidationError
 
 
 def test_config_defaults():
-    from diagnosis.config import DiagnosisConfig
+    from operation_agent.config import AgentConfig
 
-    config = DiagnosisConfig()
+    config = AgentConfig()
     assert config.model_id == "apac.anthropic.claude-sonnet-4-20250514-v1:0"
     assert config.aws_region == "ap-northeast-1"
     assert config.max_tokens == 4096
@@ -13,20 +13,20 @@ def test_config_defaults():
 
 
 def test_config_from_env(monkeypatch):
-    monkeypatch.setenv("DIAG_MODEL_ID", "us.anthropic.claude-opus-4-20250514")
-    monkeypatch.setenv("DIAG_AWS_REGION", "us-east-1")
-    monkeypatch.setenv("DIAG_MAX_TOKENS", "8192")
-    monkeypatch.setenv("DIAG_TEMPERATURE", "0.5")
+    monkeypatch.setenv("AGENT_MODEL_ID", "us.anthropic.claude-opus-4-20250514")
+    monkeypatch.setenv("AGENT_AWS_REGION", "us-east-1")
+    monkeypatch.setenv("AGENT_MAX_TOKENS", "8192")
+    monkeypatch.setenv("AGENT_TEMPERATURE", "0.5")
 
     # pydantic-settings はモジュールキャッシュを持つためインポートし直す
     import importlib
 
-    import diagnosis.config as cfg_module
+    import operation_agent.config as cfg_module
 
     importlib.reload(cfg_module)
-    from diagnosis.config import DiagnosisConfig
+    from operation_agent.config import AgentConfig
 
-    config = DiagnosisConfig()
+    config = AgentConfig()
     assert config.model_id == "us.anthropic.claude-opus-4-20250514"
     assert config.aws_region == "us-east-1"
     assert config.max_tokens == 8192
@@ -34,14 +34,14 @@ def test_config_from_env(monkeypatch):
 
 
 def test_config_invalid_temperature(monkeypatch):
-    monkeypatch.setenv("DIAG_TEMPERATURE", "not-a-float")
+    monkeypatch.setenv("AGENT_TEMPERATURE", "not-a-float")
 
     import importlib
 
-    import diagnosis.config as cfg_module
+    import operation_agent.config as cfg_module
 
     importlib.reload(cfg_module)
-    from diagnosis.config import DiagnosisConfig
+    from operation_agent.config import AgentConfig
 
     with pytest.raises((ValidationError, ValueError)):
-        DiagnosisConfig()
+        AgentConfig()

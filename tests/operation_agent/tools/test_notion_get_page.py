@@ -5,13 +5,13 @@ import pytest
 
 
 def test_notion_get_page_tool_exists():
-    from diagnosis.tools.notion_get_page import notion_get_page  # noqa: F401
+    from operation_agent.tools.notion_get_page import notion_get_page  # noqa: F401
 
 
 def test_notion_get_page_is_strands_tool():
     from strands.tools.decorator import DecoratedFunctionTool
 
-    from diagnosis.tools.notion_get_page import notion_get_page
+    from operation_agent.tools.notion_get_page import notion_get_page
 
     assert isinstance(notion_get_page, DecoratedFunctionTool)
 
@@ -32,12 +32,12 @@ def test_notion_get_page_returns_string_on_success():
         "next_cursor": None,
     }
 
-    with patch("diagnosis.tools.notion_get_page.Client") as mock_client_cls:
+    with patch("operation_agent.tools.notion_get_page.Client") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         mock_client.blocks.children.list.return_value = mock_blocks
 
-        from diagnosis.tools.notion_get_page import notion_get_page
+        from operation_agent.tools.notion_get_page import notion_get_page
 
         result = notion_get_page(page_id="page-id-1")
 
@@ -50,12 +50,12 @@ def test_notion_get_page_returns_string_on_success():
 def test_notion_get_page_passes_page_id():
     mock_blocks = {"object": "list", "results": [], "has_more": False, "next_cursor": None}
 
-    with patch("diagnosis.tools.notion_get_page.Client") as mock_client_cls:
+    with patch("operation_agent.tools.notion_get_page.Client") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         mock_client.blocks.children.list.return_value = mock_blocks
 
-        from diagnosis.tools.notion_get_page import notion_get_page
+        from operation_agent.tools.notion_get_page import notion_get_page
 
         notion_get_page(page_id="abc-123")
 
@@ -66,12 +66,12 @@ def test_notion_get_page_passes_page_id():
 def test_notion_get_page_passes_page_size():
     mock_blocks = {"object": "list", "results": [], "has_more": False, "next_cursor": None}
 
-    with patch("diagnosis.tools.notion_get_page.Client") as mock_client_cls:
+    with patch("operation_agent.tools.notion_get_page.Client") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         mock_client.blocks.children.list.return_value = mock_blocks
 
-        from diagnosis.tools.notion_get_page import notion_get_page
+        from operation_agent.tools.notion_get_page import notion_get_page
 
         notion_get_page(page_id="abc-123", page_size=50)
 
@@ -80,15 +80,15 @@ def test_notion_get_page_passes_page_size():
 
 
 def test_notion_get_page_uses_token_from_config(monkeypatch):
-    monkeypatch.setenv("DIAG_NOTION_API_TOKEN", "secret_test_token")
+    monkeypatch.setenv("AGENT_NOTION_API_TOKEN", "secret_test_token")
     mock_blocks = {"object": "list", "results": [], "has_more": False, "next_cursor": None}
 
-    with patch("diagnosis.tools.notion_get_page.Client") as mock_client_cls:
+    with patch("operation_agent.tools.notion_get_page.Client") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         mock_client.blocks.children.list.return_value = mock_blocks
 
-        from diagnosis.tools.notion_get_page import notion_get_page
+        from operation_agent.tools.notion_get_page import notion_get_page
 
         notion_get_page(page_id="test-id")
 
@@ -100,7 +100,7 @@ def test_notion_get_page_raises_on_api_error():
     from notion_client import APIResponseError
     from notion_client.errors import APIErrorCode
 
-    with patch("diagnosis.tools.notion_get_page.Client") as mock_client_cls:
+    with patch("operation_agent.tools.notion_get_page.Client") as mock_client_cls:
         mock_client = MagicMock()
         mock_client_cls.return_value = mock_client
         mock_headers = httpx.Headers({})
@@ -112,7 +112,7 @@ def test_notion_get_page_raises_on_api_error():
             raw_body_text="",
         )
 
-        from diagnosis.tools.notion_get_page import notion_get_page
+        from operation_agent.tools.notion_get_page import notion_get_page
 
         with pytest.raises(RuntimeError, match="Notion API error"):
             notion_get_page(page_id="nonexistent-id")
@@ -120,14 +120,14 @@ def test_notion_get_page_raises_on_api_error():
 
 @pytest.mark.integration
 def test_notion_get_page_integration():
-    """実際のNotion APIへのE2Eテスト（DIAG_NOTION_API_TOKEN と有効なpage_id 必要）"""
+    """実際のNotion APIへのE2Eテスト（AGENT_NOTION_API_TOKEN と有効なpage_id 必要）"""
     import os
 
-    page_id = os.environ.get("DIAG_NOTION_TEST_PAGE_ID", "")
+    page_id = os.environ.get("AGENT_NOTION_TEST_PAGE_ID", "")
     if not page_id:
-        pytest.skip("DIAG_NOTION_TEST_PAGE_ID not set")
+        pytest.skip("AGENT_NOTION_TEST_PAGE_ID not set")
 
-    from diagnosis.tools.notion_get_page import notion_get_page
+    from operation_agent.tools.notion_get_page import notion_get_page
 
     result = notion_get_page(page_id=page_id)
     assert isinstance(result, str)

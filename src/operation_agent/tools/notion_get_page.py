@@ -3,7 +3,7 @@ import json
 from notion_client import APIResponseError, Client
 from strands import tool
 
-from diagnosis.config import DiagnosisConfig
+from operation_agent.config import AgentConfig
 
 
 @tool
@@ -21,7 +21,7 @@ def notion_get_page(
         ページのブロック一覧をJSON文字列として返す。
         {"object": "list", "results": [...], "has_more": bool, "next_cursor": str | None}
     """
-    config = DiagnosisConfig()
+    config = AgentConfig()
     client = Client(auth=config.notion_api_token)
 
     try:

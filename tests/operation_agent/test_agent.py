@@ -6,10 +6,10 @@ import pytest
 def test_create_agent_returns_agent():
     from strands import Agent
 
-    with patch("diagnosis.agent.BedrockModel") as mock_model_cls:
+    with patch("operation_agent.agent.BedrockModel") as mock_model_cls:
         mock_model_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         agent = create_agent()
 
@@ -17,14 +17,14 @@ def test_create_agent_returns_agent():
 
 
 def test_create_agent_uses_config_model_id():
-    from diagnosis.config import DiagnosisConfig
+    from operation_agent.config import AgentConfig
 
-    config = DiagnosisConfig(model_id="us.anthropic.claude-opus-4-20250514")
+    config = AgentConfig(model_id="us.anthropic.claude-opus-4-20250514")
 
-    with patch("diagnosis.agent.BedrockModel") as mock_model_cls:
+    with patch("operation_agent.agent.BedrockModel") as mock_model_cls:
         mock_model_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         create_agent(config=config)
 
@@ -34,12 +34,12 @@ def test_create_agent_uses_config_model_id():
 
 def test_create_agent_uses_system_prompt():
 
-    from diagnosis.prompts import SYSTEM_PROMPT
+    from operation_agent.prompts import SYSTEM_PROMPT
 
-    with patch("diagnosis.agent.BedrockModel") as mock_model_cls:
+    with patch("operation_agent.agent.BedrockModel") as mock_model_cls:
         mock_model_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         agent = create_agent()
 
@@ -47,18 +47,18 @@ def test_create_agent_uses_system_prompt():
 
 
 def test_create_agent_with_session_id_uses_s3_session_manager():
-    from diagnosis.config import DiagnosisConfig
+    from operation_agent.config import AgentConfig
 
-    config = DiagnosisConfig(session_bucket="my-test-bucket")
+    config = AgentConfig(session_bucket="my-test-bucket")
 
     with (
-        patch("diagnosis.agent.BedrockModel") as mock_model_cls,
-        patch("diagnosis.agent.S3SessionManager") as mock_sm_cls,
+        patch("operation_agent.agent.BedrockModel") as mock_model_cls,
+        patch("operation_agent.agent.S3SessionManager") as mock_sm_cls,
     ):
         mock_model_cls.return_value = MagicMock()
         mock_sm_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         create_agent(config=config, session_id="test-session-id-12345678901234567890")
 
@@ -71,10 +71,10 @@ def test_create_agent_with_session_id_uses_s3_session_manager():
 
 
 def test_create_agent_enables_prompt_cache():
-    with patch("diagnosis.agent.BedrockModel") as mock_model_cls:
+    with patch("operation_agent.agent.BedrockModel") as mock_model_cls:
         mock_model_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         create_agent()
 
@@ -85,12 +85,12 @@ def test_create_agent_enables_prompt_cache():
 
 def test_create_agent_without_session_id_skips_s3_session_manager():
     with (
-        patch("diagnosis.agent.BedrockModel") as mock_model_cls,
-        patch("diagnosis.agent.S3SessionManager") as mock_sm_cls,
+        patch("operation_agent.agent.BedrockModel") as mock_model_cls,
+        patch("operation_agent.agent.S3SessionManager") as mock_sm_cls,
     ):
         mock_model_cls.return_value = MagicMock()
 
-        from diagnosis.agent import create_agent
+        from operation_agent.agent import create_agent
 
         create_agent()
 
@@ -102,7 +102,7 @@ def test_create_agent_integration():
     """実際のBedrockModelを使ったスモークテスト（AWS認証必要）"""
     from strands import Agent
 
-    from diagnosis.agent import create_agent
+    from operation_agent.agent import create_agent
 
     agent = create_agent()
     assert isinstance(agent, Agent)

@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir uv && \
 
 # AgentCore が呼び出すエントリポイント (HTTP サーバ, ポート 8080)
 # uv run を避け .venv を直接使うことで起動時の再 sync を防ぐ
-CMD ["/app/.venv/bin/opentelemetry-instrument", "/app/.venv/bin/python", "-m", "diagnosis"]
+CMD ["/app/.venv/bin/opentelemetry-instrument", "/app/.venv/bin/python", "-m", "operation_agent"]
