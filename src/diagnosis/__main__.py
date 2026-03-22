@@ -6,7 +6,6 @@ import boto3
 from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
 from diagnosis.agent import create_agent
-from diagnosis.telemetry import setup_telemetry
 
 
 def _resolve_ssm_secrets() -> None:
@@ -23,7 +22,6 @@ def _resolve_ssm_secrets() -> None:
 
 
 _resolve_ssm_secrets()
-setup_telemetry()
 
 app = BedrockAgentCoreApp()
 

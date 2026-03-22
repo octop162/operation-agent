@@ -8,7 +8,9 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY src/ ./src/
 RUN pip install --no-cache-dir uv && \
-    uv sync --no-dev --frozen
+    uv sync --no-dev --frozen && \
+    /app/.venv/bin/opentelemetry-bootstrap -a requirements > /tmp/otel-requirements.txt && \
+    VIRTUAL_ENV=/app/.venv uv pip install -r /tmp/otel-requirements.txt
 
 # AgentCore が呼び出すエントリポイント (HTTP サーバ, ポート 8080)
 # uv run を避け .venv を直接使うことで起動時の再 sync を防ぐ
