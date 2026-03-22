@@ -113,9 +113,7 @@ class OperationAgentStack(cdk.Stack):
             environment_variables={
                 "OTEL_SERVICE_NAME": f"operation-agent-{env_name}",
                 "AGENT_OBSERVABILITY_ENABLED": "true",
-                "DIAG_OTEL_ENABLED": "true",
-                "DIAG_OTEL_EXPORTER": "otlp",
-                "DIAG_SESSION_BUCKET": session_bucket.bucket_name,
-                "DIAG_NOTION_API_TOKEN_PARAM": notion_param,
+                "AGENT_SESSION_BUCKET": session_bucket.bucket_name,
+                "AGENT_NOTION_API_TOKEN_PARAM": notion_param,
             },
         )

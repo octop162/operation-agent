@@ -21,12 +21,8 @@ OperationAgentStack(
     env=cdk_env,
 )
 
-# AgentCore Runtime の ARN は bedrock-agentcore-control API で実行時に取得するため、
-# SSM 経由ではなく deploy.sh から環境変数で渡す想定
-agent_runtime_arn = os.environ.get(
-    "AGENT_RUNTIME_ARN",
-    f"arn:aws:bedrock-agentcore:ap-northeast-1:${{AWS::AccountId}}:agent-runtime/operation_agent_{env_name}",
-)
+# deploy.sh --slack が AWS CLI で取得した ARN を環境変数で渡す
+agent_runtime_arn = os.environ.get("AGENT_RUNTIME_ARN", "")
 
 SlackBotStack(
     app,

@@ -3,7 +3,7 @@ import json
 from notion_client import APIResponseError, Client
 from strands import tool
 
-from diagnosis.config import DiagnosisConfig
+from operation_agent.config import AgentConfig
 
 
 @tool
@@ -23,7 +23,7 @@ def notion_search(
         検索結果をJSON文字列として返す。
         {"object": "list", "results": [...], "has_more": bool}
     """
-    config = DiagnosisConfig()
+    config = AgentConfig()
     client = Client(auth=config.notion_api_token)
 
     kwargs: dict = {"query": query, "page_size": page_size}

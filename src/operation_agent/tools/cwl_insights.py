@@ -5,7 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 from strands import tool
 
-from diagnosis.config import DiagnosisConfig
+from operation_agent.config import AgentConfig
 
 _POLL_INTERVAL_SECONDS = 1
 _POLL_MAX_ATTEMPTS = 30
@@ -48,7 +48,7 @@ def cwl_insights(
         クエリ結果をJSON文字列として返す。{"status": "Complete", "results": [...], "statistics": {...}}
     """
     _validate_timestamps(start_time, end_time)
-    config = DiagnosisConfig()
+    config = AgentConfig()
     client = boto3.client("logs", region_name=config.aws_region)
 
     try:

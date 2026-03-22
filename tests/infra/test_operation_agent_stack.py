@@ -126,7 +126,7 @@ def test_agentcore_runtime_has_session_bucket_env():
     template = Template.from_stack(make_stack())
     template.has_resource_properties(
         "AWS::BedrockAgentCore::Runtime",
-        {"EnvironmentVariables": Match.object_like({"DIAG_SESSION_BUCKET": Match.any_value()})},
+        {"EnvironmentVariables": Match.object_like({"AGENT_SESSION_BUCKET": Match.any_value()})},
     )
 
 
@@ -136,7 +136,7 @@ def test_agentcore_runtime_has_notion_api_token_param_env():
         "AWS::BedrockAgentCore::Runtime",
         {
             "EnvironmentVariables": Match.object_like(
-                {"DIAG_NOTION_API_TOKEN_PARAM": "/operation-agent/dev/notion/api-key"}
+                {"AGENT_NOTION_API_TOKEN_PARAM": "/operation-agent/dev/notion/api-key"}
             )
         },
     )
